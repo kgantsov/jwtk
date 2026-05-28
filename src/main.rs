@@ -7,8 +7,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match &cli.cmd {
-        jwtk::command::Cmd::Encode { secret, payload } => {
-            if let Err(e) = encode_token(secret, payload) {
+        jwtk::command::Cmd::Encode {
+            secret,
+            payload,
+            expire,
+        } => {
+            if let Err(e) = encode_token(secret, *expire, payload) {
                 eprintln!("Error encoding JWT: {}", e);
             }
         }
