@@ -61,7 +61,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            if let Err(e) = decode_token(secret.as_deref(), token) {
+            if let Err(e) = decode_token(secret, token) {
                 eprintln!("Error decoding JWT: {}", e);
             }
         }
