@@ -68,7 +68,11 @@ fn print_token(header: &Header, claims: &BTreeMap<String, Value>, validated: boo
 
             // exp to datetime
             let exp = chrono::DateTime::from_timestamp(exp as i64, 0)
-                .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                .map(|dt| {
+                    dt.with_timezone(&chrono::Local)
+                        .format("%Y-%m-%d %H:%M:%S %z")
+                        .to_string()
+                })
                 .unwrap_or_else(|| exp.to_string());
 
             let remaining = match remaining {
