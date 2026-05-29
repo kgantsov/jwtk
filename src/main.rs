@@ -1,6 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 use colored::Colorize;
+use jsonwebtoken::Algorithm;
 use jwtk::command::Cli;
 use jwtk::token::{decode_token, encode_token};
 
@@ -12,6 +13,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             secret,
             payload,
             expire,
+            alg: algorithm,
         } => {
             let mut secret_input = String::new();
             let secret = match secret {
@@ -27,7 +29,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            if let Err(e) = encode_token(secret, *expire, payload) {
+            if let Err(e) = encode_token(*algorithm, secret, *expire, payload) {
                 eprintln!("Error encoding JWT: {}", e);
             }
         }

@@ -1,5 +1,6 @@
 use clap::Parser;
 use clap::Subcommand;
+use jsonwebtoken::Algorithm;
 
 #[derive(Subcommand, Debug)]
 pub enum Cmd {
@@ -15,6 +16,10 @@ pub enum Cmd {
         /// Token lifetime in seconds from now (default: 3600). The `exp` claim is added automatically
         #[arg(short, long, default_value_t = 3600)]
         expire: u64,
+
+        /// Algorithm to use for signing (default: HS256). For example: HS256, HS384, HS512, RS256, RS384, RS512
+        #[arg(short, long, default_value = "HS256")]
+        alg: Algorithm,
     },
     /// Decode a JWT and optionally verify its signature
     Decode {

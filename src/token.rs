@@ -1,11 +1,13 @@
 use anyhow::Result;
 use colored::Colorize;
-use jsonwebtoken::{DecodingKey, EncodingKey, Header, TokenData, Validation, decode, encode};
+use jsonwebtoken::{
+    Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation, decode, encode,
+};
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub fn encode_token(secret: &str, expire: u64, payload: &str) -> Result<()> {
+pub fn encode_token(algorithm: Algorithm, secret: &str, expire: u64, payload: &str) -> Result<()> {
     let mut claims: BTreeMap<String, Value> = BTreeMap::new();
 
     let payload: Value = serde_json::from_str(payload)?;
@@ -23,11 +25,8 @@ pub fn encode_token(secret: &str, expire: u64, payload: &str) -> Result<()> {
     );
     println!("Expire in {} seconds (exp: {})", expire, now + expire);
 
-    let token = encode(
-        &Header::default(),
-        &claims,
-        &EncodingKey::from_secret(secret.as_ref()),
-    )?;
+    let header = Header::new(algorithm);
+    let token = encode(&header, &claims, &EncodingKey::from_secret(secret.as_ref()))?;
 
     println!("Generated JWT token: {}", token.green());
 
