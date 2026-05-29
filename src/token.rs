@@ -1,5 +1,5 @@
+use crate::printer::{print_expiration, print_header, print_kv, print_token};
 use anyhow::Result;
-use colored::Colorize;
 use jsonwebtoken::{
     Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation, decode, encode,
 };
@@ -19,16 +19,21 @@ pub fn encode_token(algorithm: Algorithm, secret: &str, expire: u64, payload: &s
     }
 
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+    let expire_in_sec = now + expire;
     claims.insert(
         "exp".to_string(),
-        Value::Number(serde_json::Number::from(now + expire)),
+        Value::Number(serde_json::Number::from(expire_in_sec)),
     );
-    println!("Expire in {} seconds (exp: {})", expire, now + expire);
 
     let header = Header::new(algorithm);
     let token = encode(&header, &claims, &EncodingKey::from_secret(secret.as_ref()))?;
 
-    println!("Generated JWT token: {}", token.green());
+    print_header("JWT");
+    print_kv("Algorithm", format!("{:?}", header.alg).as_str());
+    print_kv("Payload", &payload.to_string());
+
+    print_expiration(expire_in_sec)?;
+    print_kv("Token", token.as_str());
 
     Ok(())
 }
@@ -50,51 +55,4 @@ pub fn decode_token(secret: Option<&str>, token: &str) -> Result<()> {
     }
 
     Ok(())
-}
-
-fn print_token(header: &Header, claims: &BTreeMap<String, Value>, validated: bool) {
-    println!("\n{}", "Headers:".bold());
-
-    let validated = if validated { "Yes".green() } else { "No".red() };
-
-    println!(" {:.<25}: {}", "Validated".cyan(), validated);
-    println!(" {:.<25}: {:?}", "Algorithm".cyan(), header.alg);
-
-    claims.get(&"exp".to_string()).and_then(|exp| {
-        if let Some(exp) = exp.as_u64() {
-            let now = SystemTime::now().duration_since(UNIX_EPOCH).ok()?.as_secs();
-            let remaining = exp.saturating_sub(now);
-
-            // exp to datetime
-            let exp = chrono::DateTime::from_timestamp(exp as i64, 0)
-                .map(|dt| {
-                    dt.with_timezone(&chrono::Local)
-                        .format("%Y-%m-%d %H:%M:%S")
-                        .to_string()
-                })
-                .unwrap_or_else(|| exp.to_string());
-
-            let remaining = match remaining {
-                0 => "expired".red().to_string(),
-                1..=60 => format!("{} seconds remaining", remaining)
-                    .yellow()
-                    .to_string(),
-                61..=3600 => format!("{} minutes remaining", remaining / 60).to_string(),
-                3601..=86400 => format!("{} hours remaining", remaining / 3600).to_string(),
-                _ => format!("{} days remaining", remaining / 86400).to_string(),
-            };
-            println!(
-                " {:.<25}: {} ({})",
-                "Expiration (exp)".cyan(),
-                exp,
-                remaining
-            );
-        }
-        Some(())
-    });
-
-    println!("\n{}", "Payload:".bold());
-    for (claim, value) in claims {
-        println!(" {:.<25}: {}", claim.cyan(), value);
-    }
 }
