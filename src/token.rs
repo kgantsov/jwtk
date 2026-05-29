@@ -1,4 +1,5 @@
 use anyhow::Result;
+use colored::Colorize;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, TokenData, Validation, decode, encode};
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -28,7 +29,7 @@ pub fn encode_token(secret: &str, expire: u64, payload: &str) -> Result<()> {
         &EncodingKey::from_secret(secret.as_ref()),
     )?;
 
-    println!("Generated JWT token: {}", token);
+    println!("Generated JWT token: {}", token.green());
 
     Ok(())
 }
@@ -53,9 +54,12 @@ pub fn decode_token(secret: Option<&str>, token: &str) -> Result<()> {
 }
 
 fn print_token(header: &Header, claims: &BTreeMap<String, Value>, validated: bool) {
-    println!("\nHeaders:");
-    println!(" {:.<25}: {:?}", "Validated", validated);
-    println!(" {:.<25}: {:?}", "Algorithm", header.alg);
+    println!("\n{}", "Headers:".bold());
+
+    let validated = if validated { "Yes".green() } else { "No".red() };
+
+    println!(" {:.<25}: {}", "Validated".cyan(), validated);
+    println!(" {:.<25}: {:?}", "Algorithm".cyan(), header.alg);
 
     claims.get(&"exp".to_string()).and_then(|exp| {
         if let Some(exp) = exp.as_u64() {
@@ -66,16 +70,28 @@ fn print_token(header: &Header, claims: &BTreeMap<String, Value>, validated: boo
             let exp = chrono::DateTime::from_timestamp(exp as i64, 0)
                 .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
                 .unwrap_or_else(|| exp.to_string());
+
+            let remaining = match remaining {
+                0 => "expired".red().to_string(),
+                1..=60 => format!("{} seconds remaining", remaining)
+                    .yellow()
+                    .to_string(),
+                61..=3600 => format!("{} minutes remaining", remaining / 60).to_string(),
+                3601..=86400 => format!("{} hours remaining", remaining / 3600).to_string(),
+                _ => format!("{} days remaining", remaining / 86400).to_string(),
+            };
             println!(
-                " {:.<25}: {} ({} seconds remaining)",
-                "Expiration (exp)", exp, remaining
+                " {:.<25}: {} ({})",
+                "Expiration (exp)".cyan(),
+                exp,
+                remaining
             );
         }
         Some(())
     });
 
-    println!("\nPayload:");
+    println!("\n{}", "Payload:".bold());
     for (claim, value) in claims {
-        println!(" {:.<25}: {}", claim, value);
+        println!(" {:.<25}: {}", claim.cyan(), value);
     }
 }

@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use colored::Colorize;
 use jwtk::command::Cli;
 use jwtk::token::{decode_token, encode_token};
 
@@ -17,7 +18,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Some(t) if t != "-" => t.as_str(),
                 _ => {
                     // Read token from stdin
-                    println!("Please enter the secret (press Enter when done):");
+                    println!(
+                        "{}",
+                        "Please enter the secret (press Enter when done):".dimmed()
+                    );
                     std::io::stdin().read_line(&mut secret_input)?;
                     secret_input.trim()
                 }
@@ -34,7 +38,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Some(t) if t != "-" => Some(t.as_str()),
                 _ => {
                     // Read token from stdin
-                    println!("Please enter the secret (press Enter when done):");
+                    println!(
+                        "{}",
+                        "Please enter the secret (press Enter when done):".dimmed()
+                    );
                     std::io::stdin().read_line(&mut secret_input)?;
                     Some(secret_input.trim())
                 }
@@ -45,7 +52,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Some(t) if t != "-" => t.as_str(),
                 _ => {
                     // Read token from stdin
-                    println!("\nPlease enter the JWT token to decode (press Enter when done):");
+                    println!(
+                        "{}",
+                        "Please enter the JWT token to decode (press Enter when done):".dimmed()
+                    );
                     std::io::stdin().read_line(&mut token_input)?;
                     token_input.trim()
                 }
