@@ -45,8 +45,7 @@ jwtk decode --token <TOKEN>
 Headers:
  Validated.................: true
  Algorithm.................: HS256
-
-Expiration (exp)..........: 2026-05-28 13:00:00 (295 seconds remaining)
+ Expiration (exp)..........: 2026-05-28 13:00:00 (295 seconds remaining)
 
 Payload:
  exp.......................: 1748433600
