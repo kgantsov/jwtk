@@ -1,7 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
 use colored::Colorize;
-use jsonwebtoken::Algorithm;
 use jwtk::command::Cli;
 use jwtk::token::{decode_token, encode_token};
 
