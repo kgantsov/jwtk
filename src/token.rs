@@ -28,7 +28,7 @@ pub fn encode_token(algorithm: Algorithm, secret: &str, expire: u64, payload: &s
     let header = Header::new(algorithm);
     let token = encode(&header, &claims, &EncodingKey::from_secret(secret.as_ref()))?;
 
-    print_header("JWT");
+    print_header("JWT:");
     print_kv("Algorithm", format!("{:?}", header.alg).as_str());
     print_kv("Payload", &payload.to_string());
 

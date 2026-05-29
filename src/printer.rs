@@ -52,7 +52,7 @@ pub fn print_token(header: &Header, claims: &BTreeMap<String, Value>, validated:
         Some(())
     });
 
-    print_header("\nPayload");
+    print_header("\nPayload:");
     for (claim, value) in claims {
         print_kv(claim, &value.to_string());
     }
