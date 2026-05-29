@@ -3,27 +3,27 @@ use clap::Subcommand;
 
 #[derive(Subcommand, Debug)]
 pub enum Cmd {
-    /// Proportional resize to fit within max dimensions, no canvas padding
+    /// Encode a payload as a signed JWT
     Encode {
-        /// JWT payload to encode (e.g., a JSON string)
+        /// JSON payload to encode (e.g. '{"sub":"1234","name":"Alice"}')
         #[arg(short, long)]
         payload: String,
-        /// Secret key for encoding (must be the same as the one used for decoding)
-        #[arg(short, long)]
-        secret: String,
+        /// HMAC secret key. Omit the value (or pass `-`) to read from stdin
+        #[arg(short, long, num_args = 0..=1, default_missing_value = "-")]
+        secret: Option<String>,
 
-        /// Expiration time in seconds (optional, default is 3600 seconds or 1 hour)
+        /// Token lifetime in seconds from now (default: 3600). The `exp` claim is added automatically
         #[arg(short, long, default_value_t = 3600)]
         expire: u64,
     },
-    /// Smart Instagram sizing: 1080×1080 for landscape, 1080×1350 for portrait
+    /// Decode a JWT and optionally verify its signature
     Decode {
-        /// JWT token to decode
-        #[arg(short, long)]
-        token: String,
-        /// Optional secret key for decoding (must be the same as the one used for encoding)
-        /// If not provided, the tool will decode the payload without verifying the signature, which may be less secure.
-        #[arg(short, long)]
+        /// JWT token to decode. Omit the value (or pass `-`) to read from stdin
+        #[arg(short, long, default_missing_value = "-")]
+        token: Option<String>,
+        /// HMAC secret for signature verification. Omit to skip verification.
+        /// Omit the value (or pass `-`) to read from stdin
+        #[arg(short, long, num_args = 0..=1, default_missing_value = "-")]
         secret: Option<String>,
     },
 }

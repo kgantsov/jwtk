@@ -18,11 +18,19 @@ jwtk encode --secret <SECRET> --payload '<JSON>' [--expire <SECONDS>]
 
 `--expire` sets the token lifetime in seconds from now. Defaults to `3600` (1 hour). The `exp` claim is added automatically.
 
-**Example:**
+If `--secret` is given without a value (or with `-`), the secret is read interactively from stdin.
+
+**Examples:**
 
 ```bash
+# Secret as argument
 jwtk encode --secret mysecret --payload '{"sub":"1234","name":"Alice"}' --expire 300
-# Generated JWT token: eyJ0eXAi...
+
+# Secret read from stdin (prompted)
+jwtk encode --secret --payload '{"sub":"1234","name":"Alice"}'
+
+# Secret piped from another command
+echo -n mysecret | jwtk encode --secret - --payload '{"sub":"1234","name":"Alice"}'
 ```
 
 ### Decode
@@ -37,6 +45,21 @@ Decode without verification:
 
 ```bash
 jwtk decode --token <TOKEN>
+```
+
+If `--token` or `--secret` is given without a value (or with `-`), it is read from stdin.
+
+**Stdin examples:**
+
+```bash
+# Token piped in, secret as argument
+echo '<TOKEN>' | jwtk decode --token - --secret mysecret
+
+# Both token and secret read interactively
+jwtk decode --token --secret
+
+# Token piped, no signature verification
+echo '<TOKEN>' | jwtk decode --token -
 ```
 
 **Example output:**

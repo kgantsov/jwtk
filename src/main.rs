@@ -12,11 +12,45 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             payload,
             expire,
         } => {
+            let mut secret_input = String::new();
+            let secret = match secret {
+                Some(t) if t != "-" => t.as_str(),
+                _ => {
+                    // Read token from stdin
+                    println!("Please enter the secret (press Enter when done):");
+                    std::io::stdin().read_line(&mut secret_input)?;
+                    secret_input.trim()
+                }
+            };
+
             if let Err(e) = encode_token(secret, *expire, payload) {
                 eprintln!("Error encoding JWT: {}", e);
             }
         }
         jwtk::command::Cmd::Decode { token, secret } => {
+            let mut secret_input = String::new();
+            let secret = match secret {
+                None => None,
+                Some(t) if t != "-" => Some(t.as_str()),
+                _ => {
+                    // Read token from stdin
+                    println!("Please enter the secret (press Enter when done):");
+                    std::io::stdin().read_line(&mut secret_input)?;
+                    Some(secret_input.trim())
+                }
+            };
+
+            let mut token_input = String::new();
+            let token = match token {
+                Some(t) if t != "-" => t.as_str(),
+                _ => {
+                    // Read token from stdin
+                    println!("\nPlease enter the JWT token to decode (press Enter when done):");
+                    std::io::stdin().read_line(&mut token_input)?;
+                    token_input.trim()
+                }
+            };
+
             if let Err(e) = decode_token(secret.as_deref(), token) {
                 eprintln!("Error decoding JWT: {}", e);
             }
