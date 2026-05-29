@@ -1,6 +1,6 @@
 # jwtk
 
-A minimal CLI for encoding and decoding JWTs signed with HMAC-SHA256.
+A minimal CLI for encoding and decoding JWTs.
 
 ## Install
 
@@ -13,10 +13,20 @@ cargo install --path .
 ### Encode
 
 ```bash
-jwtk encode --secret <SECRET> --payload '<JSON>' [--expire <SECONDS>]
+jwtk encode --secret <SECRET> --payload '<JSON>' [--expire <SECONDS>] [--alg <ALGORITHM>]
 ```
 
 `--expire` sets the token lifetime in seconds from now. Defaults to `3600` (1 hour). The `exp` claim is added automatically.
+
+`--alg` sets the signing algorithm. Defaults to `HS256`. Supported values:
+
+| Family | Algorithms |
+|--------|------------|
+| HMAC | `HS256`, `HS384`, `HS512` |
+| RSA PKCS#1 | `RS256`, `RS384`, `RS512` |
+| RSA-PSS | `PS256`, `PS384`, `PS512` |
+| ECDSA | `ES256`, `ES384` |
+| EdDSA | `EdDSA` |
 
 If `--secret` is given without a value (or with `-`), the secret is read interactively from stdin.
 
