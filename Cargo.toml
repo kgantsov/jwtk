@@ -1,10 +1,10 @@
 [package]
 name = "jwtk"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.102"
+anyhow = "1.0"
 chrono = "0.4.44"
 clap = { version = "4", features = ["derive"] }
 colored = "3.1.1"
